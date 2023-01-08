@@ -89,3 +89,31 @@ std::string getUserType(std::string username)
 
 	return "0";
 }
+
+bool userExist(std::string username, std::string password)
+{
+	std::fstream file("Users.txt", std::ios::in);
+	int n = num_of_lines("Users.txt");
+
+	std::string out;
+
+	for (int i = 0; i < n; i++)
+	{
+		int check = 0;
+		for (int j = 0; j < 6; j++)
+		{
+			file >> out;
+			if ((j == 2) && (out == username))
+			{
+				check++;
+			}
+			if ((j == 3) && (out == password))
+			{
+				check++;
+			}
+			if (check == 2) return true;
+		}
+	}
+
+	return false;
+}
