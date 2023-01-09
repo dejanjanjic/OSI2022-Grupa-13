@@ -89,7 +89,7 @@ void login()
 		std::cout << "Unesite vasu lozinku: \n";
 		std::cin >> password;
 
-		correctInput = userExist(username, password); //provjera da li username i passwor postoje u sistemu
+		correctInput = userExist(username, password); //provjera da li username i password postoje u sistemu
 		if (correctInput == false)
 		{
 			system("cls");

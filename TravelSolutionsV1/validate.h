@@ -117,3 +117,41 @@ bool userExist(std::string username, std::string password)
 
 	return false;
 }
+
+bool checkStartLocation(std::string startlocation)
+{
+	std::fstream file;
+	std::string line;
+	bool check = false;
+	file.open("startLocations.txt", std::ios::in);
+	if (file.is_open()) {
+		
+		while (getline(file, line))
+		{
+			if (line == startlocation)
+				check = true;
+		}
+		file.close();
+
+		return check;
+	}
+}
+
+bool checkEndLocation(std::string endlocation)
+{
+	std::fstream file;
+	std::string line;
+	bool check = false;
+	file.open("endLocations.txt", std::ios::in);
+	if (file.is_open()) {
+
+		while (getline(file, line))
+		{
+			if (line == endlocation)
+				check = true;
+		}
+		file.close();
+		
+		return check;
+	}
+}
