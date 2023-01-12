@@ -32,8 +32,8 @@ public:
 				this->password = pass;
 				if (isSuspended == "true") this->suspended = true;
 				else this->suspended = false;
-				if (busy == "true") this->suspended = true;
-				else this->suspended = false;
+				if (busy == "true") this->isBusy = true;
+				else this->isBusy= false;
 			}
 		}
 	}

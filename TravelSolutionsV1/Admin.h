@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include "Person.h"
 #include "validate.h"
+#include "manipulate.h"
+#include <random>
 
 class Admin : public Person
 {
@@ -29,11 +31,12 @@ public:
 				this->password = pass;
 			}
 		}
+		file.close();
 	}
 
 	void addTour()
 	{
-		std::string id, startTime, endTime, withinBorder;
+		std::string id, withinBorder;
 		int num;
 		bool check, checkId;
 		std::fstream tourFile;
@@ -53,6 +56,7 @@ public:
 		std::cout << "Unesite koliko lokacija ce imati tura:\n";
 		std::cin >> num;
 		tourFile << num << " ";
+		
 		system("cls");
 		do {
 			std::string location;
@@ -60,20 +64,26 @@ public:
 			std::cin >> location;
 			check = checkLocation(location);
 			if (check == true) {
-				tourFile << location << " ";
+				tourFile << location;
+				if (num != 1)
+				{
+					tourFile << ",";
+				}
+				else
+				{
+					tourFile << " ";
+				}
+			    
 				num--;
 			}
 			else
 				std::cout << "Lokaciju nije moguce dodati u turu.\n";
 		} while (num);
 
-		std::cout << "Unesite vrijeme polaska:\n";
-		std::cin >> startTime;
-		std::cout << "Unesite vrijeme dolaska:\n";
-		std::cin >> endTime;
+		
 		std::cout << "Da li je tura unutar granice drzave? (Unesite Da ili Ne) \n";
 		std::cin >> withinBorder;
-		tourFile << startTime << "  " << endTime << "  ";
+
 		if (withinBorder == "Da") {
 			tourFile << "1" << std::endl;
 		}
@@ -83,6 +93,7 @@ public:
 		tourFile.close();
 	}
 
+    //radi
 	void addBus()
 	{
 		std::string id, model, hasWifi, hasWc, isAvailable = "true";
@@ -92,7 +103,7 @@ public:
 		std::cout << "Unesite jedinstveni ID busa:\n";
 		std::cin >> id;
 		do {
-			checkId = check_id_bus(id);
+			checkId = check_id_bus(id) && !check_idBus_exist(id);
 			if (checkId == true) {
 				busFile.open("Bus.txt", std::ios::app);
 				busFile << id << " ";
@@ -126,21 +137,31 @@ public:
 		busFile.close();
 	}
 
+	//radi
 	void addLocation()
 	{
+		std::cout << "\n";
 		std::string location;
 		bool check;
 		std::fstream locationFile;
 		do {
 			std::cout << "Unesite lokaciju koju zelite da dodate:\n";
 			std::cin >> location;
+			std::cout << "\n";
 			check = checkLocation(location);
 			if (check == false) {
 				locationFile.open("Locations.txt", std::ios::app);
 				if (locationFile.is_open())
 					locationFile << location << "\n";
+
+			}
+			else
+			{
+				system("cls");
+				std::cout << "Unesena lokacija vec postoji!!\n";
 			}
 		} while (check == true);
+		locationFile.close();
 	}
 
 	void addDrive()
@@ -197,18 +218,28 @@ public:
 
 	}
 
+
+	//helper za addCoupon
+	std::string generate_random_string() 
+	{
+		std::string random_string;
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(0, 25); 
+		for (int i = 0; i < 15; i++) {
+			char c = 'a' + dis(gen);
+			random_string += c;
+		}
+		return random_string;
+	}
+
+	//radi
 	void addCoupon()
 	{
-		char alpha[73] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n','o', 'p', 'q', 'r',
-		's', 't', 'u', 'v', 'w', 'x', 'y', 'z' , 'A' , 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-		'N','O', 'P', 'Q', 'R','S', 'T','U', 'V', 'W','X','Y','Z', '0', '1','2','3','4','5','6','7','8','9', '/',
-		'*','-','+','(', ')', '%', '&', '=', '!', '?' };
-
-		std::string result = "", value;
-		for (int i = 0; i < 10; i++)
-			result = result + alpha[rand() % 73];
+		std::string result, value;
 		std::cout << "Unesite vrijednost bona:\n";
 		std::cin >> value;
+		result = generate_random_string();
 		std::fstream couponFile;
 		couponFile.open("Coupons.txt", std::ios::app);
 		if (couponFile.is_open()) {
@@ -231,50 +262,7 @@ public:
 			std::cin >> option;
 			if (option == "1")
 			{
-				std::string option1;
-				system("cls");
-				do
-				{
-					std::cout << "\nIzaberite unosenjem broja zeljenu opciju za dodavanje podataka:\n\n";
-					std::cout << "1) Dodaj turu\n";
-					std::cout << "2) Dodaj autobus\n";
-					std::cout << "3) Dodaj lokaciju\n";
-					std::cout << "4) Dodaj voznju\n";
-					std::cout << "5) Dodaj poklon bon\n";
-					std::cout << "--> ";
-					std::cin >> option1;
-
-					if (option1 == "1")
-					{
-						system("cls");
-						addTour();
-					}
-					else if (option1 == "2")
-					{
-						system("cls");
-						addBus();
-					}
-					else if (option1 == "3")
-					{
-						system("cls");
-						addLocation();
-					}
-					else if (option1 == "4")
-					{
-						system("cls");
-						addDrive();
-					}
-					else if (option1 == "5")
-					{
-						system("cls");
-						addCoupon();
-					}
-					else
-					{
-						system("cls");
-						std::cout << "Izabrali ste nepostojecu opciju. Pokusajte ponovo " << std::endl;
-					}
-				} while (option1 != "1" && option1 != "2" && option1 != "3" && option1 != "4" && option1 != "5");
+				addData();
 			}
 			else if (option == "2")
 			{
@@ -289,6 +277,7 @@ public:
 					std::cout << "4) Pregled voznji\n";
 					std::cout << "5) Pregled poklon bonova\n";
 					std::cout << "6) Pregled obavjestenja\n";
+					std::cout << "7) Vrati nazad\n";
 					std::cout << "--> ";
 					std::cin >> option2;
 					if (option2 == "1")
@@ -321,6 +310,11 @@ public:
 						system("cls");
 						//notificationOverview();
 					}
+					else if (option2 == "7")
+					{
+						system("cls");
+						menu();
+					}
 					else
 					{
 						system("cls");
@@ -328,12 +322,225 @@ public:
 					}
 				} while (option2 != "1" && option2 != "2" && option2 != "3" && option2 != "4" && option2 != "5" && option2 != "6");
 			}
-			//else {}
+			else if (option == "3")
+			{
+			manipulate();
+			}
 
 		} while (option != "1" && option != "2" && option != "3");
 
 	}
 
+	void manipulate()
+	{
+		system("cls");
+		std::string option_admin;
+		do
+		{
+			std::cout << "\nIzaberite unosenjem broja zeljenu opciju:\n\n";
+			std::cout << "1.) Kreiranje naloga za vozace\n";
+			std::cout << "2.) Brisanje naloga\n";
+			std::cout << "3.) Deaktivacija naloga\n";
+			std::cout << "4.) Aktivacija naloga\n";
+			std::cout << "5.) Vrati nazad\n";
+			std::cout << "--> ";
+			std::cin >> option_admin;
+			system("cls");
+			if (option_admin == "1")
+			{
+				registration("3");
+			}
+			else if (option_admin == "2")
+			{
+				std::cout << "Unesite korisnicko ime naloga koji zelite obrisati: ";
+				std::string delete_name;
+				std::cin >> delete_name;
+				if (manipulate_at(delete_name) != 0)
+				{
+					system("cls");
+					std::cout << "Korisnik " << delete_name << " je uspjesno izbrisan iz baze\n";
+					delete_line(delete_name);
+				}
+				else
+				{
+					system("cls");
+					std::cout << "Korisnik ne postoji ili pokusavate izbrisati administratorski nalog\n";
+				}
+			}
+			else if (option_admin == "3")
+			{
+				std::cout << "Unesite korisnicko ime naloga koji zelite suspendovati: ";
+				std::string suspend_name;
+				std::cin >> suspend_name;
+				if ((manipulate_at(suspend_name) != 0) && (suspend_at(suspend_name) != 0))
+				{
+					system("cls");
+					std::cout << "Korisnik " << suspend_name << " je uspjesno suspendovan\n";
+				}
+				else
+				{
+					system("cls");
+					std::cout << "Korisnik ne postoji ili pokusavate suspendovati administratorski nalog\n";
+				}
+			}
+			else if (option_admin == "4")
+			{
+				std::cout << "Unesite korisnicko ime naloga koji zelite aktivirati: ";
+				std::string activate_name;
+				std::cin >> activate_name;
+				if ((manipulate_at(activate_name) != 0) && (activate_at(activate_name) != 0))
+				{
+					system("cls");
+					std::cout << "Korisnik " << activate_name << " je uspjesno aktiviran\n";
+				}
+				else
+				{
+					system("cls");
+					std::cout << "Korisnik ne postoji ili pokusavate aktivirati nesuspendovan nalog\n";
+				}
+			}
+			else if (option_admin == "5")
+			{
+				system("cls");
+				menu();
+			}
+		} while (option_admin != "1" && option_admin != "2" && option_admin != "3" && option_admin != "4");
+
+	}
+	void addData()
+	{
+		std::string option1;
+		system("cls");
+		do
+		{
+			std::cout << "\nIzaberite unosenjem broja zeljenu opciju za dodavanje podataka:\n\n";
+			std::cout << "1) Dodaj turu\n";
+			std::cout << "2) Dodaj autobus\n";
+			std::cout << "3) Dodaj lokaciju\n";
+			std::cout << "4) Dodaj voznju\n";
+			std::cout << "5) Dodaj poklon bon\n";
+			std::cout << "6) Vrati nazad\n";
+			std::cout << "--> ";
+			std::cin >> option1;
+
+			if (option1 == "1")
+			{
+				system("cls");
+				addTour();
+			}
+			else if (option1 == "2")
+			{
+				system("cls");
+				addBus();
+				system("cls");
+				int o;
+				std::cout << "Bus uspjesno dodan\n\n";
+				do
+				{
+					std::cout << "Zelite li dodati jos buseva, ili povratak nazad?\n";
+					std::cout << "1.) Dodavanje busa\n";
+					std::cout << "2.) Povratak nazad\n";
+
+					std::cin >> o;
+					if (o == 1)
+					{
+						system("cls");
+						addBus();
+					}
+					else if (o == 2)
+					{
+						system("cls");
+						addData();
+					}
+					else
+					{
+						system("cls");
+						std::cout << "Nepoznata opcija, probajte ponovo!\n";
+					}
+				} while (o != 2);
+			}
+			else if (option1 == "3")
+			{
+				system("cls");
+				addLocation();
+				system("cls");
+				int o;
+				std::cout << "Lokacija uspjesno dodata\n\n";
+				do
+				{
+					std::cout << "Zelite li dodati jos lokacija, ili povratak nazad?\n";
+					std::cout << "1.) Dodavanje lokacija\n";
+					std::cout << "2.) Povratak nazad\n";
+
+					std::cin >> o;
+					if (o == 1)
+					{
+						system("cls");
+						addLocation();
+					}
+					else if (o == 2)
+					{
+						system("cls");
+						addData();
+					}
+					else
+					{
+						system("cls");
+						std::cout << "Nepoznata opcija, probajte ponovo!\n";
+					}
+				} while (o != 2);
+			}
+			else if (option1 == "4")
+			{
+				system("cls");
+				addDrive();
+			}
+			else if (option1 == "5")
+			{
+				system("cls");
+				addCoupon();
+				system("cls");
+				int o;
+				std::cout << "Bon uspjesno dodat\n\n";
+				do
+				{
+					std::cout << "Zelite li dodati jos bonova, ili povratak nazad?\n";
+					std::cout << "1.) Dodavanje bona\n";
+					std::cout << "2.) Povratak nazad\n";
+					
+					std::cin >> o;
+					if (o == 1)
+					{
+						system("cls");
+						addCoupon();
+					}
+					else if (o == 2)
+					{
+						system("cls");
+						addData();
+					}
+					else
+					{
+						system("cls");
+						std::cout << "Nepoznata opcija, probajte ponovo!\n";
+					}
+				} while (o != 2);
+				
+
+			}
+			else if (option1 == "6")
+			{
+			system("cls");
+			menu();
+            }
+			else
+			{
+				system("cls");
+				std::cout << "Izabrali ste nepostojecu opciju. Pokusajte ponovo " << std::endl;
+			}
+			//addData();
+		} while (option1 != "1" && option1 != "2" && option1 != "3" && option1 != "4" && option1 != "5");
+	}
 	/*void set_user_type() override
 	{
 		this->user_type = "2";

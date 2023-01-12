@@ -24,56 +24,7 @@ int main()
 	return 0;
 }
 
-bool registration(std::string type)
-{
-	int counter;
-	std::string name, surname, password, username;
 
-	do
-	{
-		counter = 0;
-		std::cout << "Unesite ime: " << std::endl;
-		std::cin >> name;
-		std::cout << "Unesite prezime: " << std::endl;
-		std::cin >> surname;
-		std::cout << "Unesite korisnicko ime: " << std::endl;
-		std::cin >> username;
-		std::cout << "Unesite lozinku: " << std::endl;
-		std::cin >> password;
-
-		system("cls");
-
-		if (!check_name_or_surname(name)) { std::cout << "Ime nije u odgovarajucem formatu" << std::endl;}
-		else { counter++; }
-		if (!check_name_or_surname(surname)) { std::cout << "Prezime nije u odgovarajucem formatu" << std::endl;}
-		else { counter++; }
-		if (!check_password(password)) { std::cout << "Lozinka nije u odgovarajucem formatu" << std::endl;}
-		else { counter++; }
-		if (!check_username(username)) { std::cout << "Korisnicko ime vec postoji ili je prekratko" << std::endl;}
-		else { counter++; }
-
-		if (counter != 4) { std::cout << std::endl << "Probajte ponovo\n" << std::endl; }
-
-	} while (counter != 4);
-
-	//Upis u datoteku na osnovu tipa osobe. Svaka osoba se drugacuje upisuje u datoteku, u zavisnosti od podataka koji se trebaju cuvati.
-	std::fstream file("Users.txt", std::ios::in | std::ios::out | std::ios::app);
-	if(type == "1")
-	{
-		file << name << " " << surname << " " << username << " " << password << " " << type << " " << "false" << " " << "0.0" << "\n";
-
-	}
-	else if (type == "2")
-	{
-		file << name << " " << surname << " " << username << " " << password << " " << type << "\n";
-	}
-	else if (type == "3")
-	{
-		file << name << " " << surname << " " << username << " " << password << " " << type << " " << "false" << " " << "false" << "\n";
-	}
-	return 1;
-
-}
 
 void login()
 {
@@ -102,7 +53,7 @@ void login()
 			{
 				system("cls");
 				//Korisnik se ulogovao na sistem, kreira se objekat
-				User user(username); 
+				User user(username);
 				user.menu();
 			}
 			else if (type == "2")
@@ -167,10 +118,12 @@ void startPage()
 	//ako je prva prijava na sistem
 	if (temp == "admin" && num_of_lines("Users.txt") == 1)
 	{
+		usersFile.close();
 		firstLogin();
 	}
 	else
 	{
+		usersFile.close();
 		std::cout << "Dobrodosli, vas TravelSolutions\n";
 		std::string option;
 		do

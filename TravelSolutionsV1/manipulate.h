@@ -2,10 +2,62 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include "validate.h"
 
 //BIBLIOTEKA ZA MANIPULACIJU OBJEKTIMA
 
+
+bool registration(std::string type)
+{
+	int counter;
+	std::string name, surname, password, username;
+
+	do
+	{
+		counter = 0;
+		std::cout << "Unesite ime: " << std::endl;
+		std::cin >> name;
+		std::cout << "Unesite prezime: " << std::endl;
+		std::cin >> surname;
+		std::cout << "Unesite korisnicko ime: " << std::endl;
+		std::cin >> username;
+		std::cout << "Unesite lozinku: " << std::endl;
+		std::cin >> password;
+
+		system("cls");
+
+		if (!check_name_or_surname(name)) { std::cout << "Ime nije u odgovarajucem formatu" << std::endl; }
+		else { counter++; }
+		if (!check_name_or_surname(surname)) { std::cout << "Prezime nije u odgovarajucem formatu" << std::endl; }
+		else { counter++; }
+		if (!check_password(password)) { std::cout << "Lozinka nije u odgovarajucem formatu" << std::endl; }
+		else { counter++; }
+		if (!check_username(username)) { std::cout << "Korisnicko ime vec postoji ili je prekratko" << std::endl; }
+		else { counter++; }
+
+		if (counter != 4) { std::cout << std::endl << "Probajte ponovo\n" << std::endl; }
+
+	} while (counter != 4);
+
+	//Upis u datoteku na osnovu tipa osobe. Svaka osoba se drugacuje upisuje u datoteku, u zavisnosti od podataka koji se trebaju cuvati.
+	std::fstream file("Users.txt", std::ios::in | std::ios::out | std::ios::app);
+	if (type == "1")
+	{
+		file << name << " " << surname << " " << username << " " << password << " " << type << " " << "false" << " " << "0.0" << "\n";
+
+	}
+	else if (type == "2")
+	{
+		file << name << " " << surname << " " << username << " " << password << " " << type << "\n";
+	}
+	else if (type == "3")
+	{
+		file << name << " " << surname << " " << username << " " << password << " " << type << " " << "false" << " " << "false" << "\n";
+	}
+	return 1;
+
+}
 
 //VRACA LINIJU U KOJOJ SE NALAZE INFORMACIJE O KORISNIKU USERNAME
 int manipulate_at(std::string username)
@@ -68,43 +120,41 @@ bool suspend_at(std::string username)
 {
 	int check = 0;
 
-	std::fstream file("Users.txt", std::ios::in);
+	std::fstream oldFile("Users.txt", std::ios::in);
+	std::fstream newFile("TempName.txt", std::ios::out);
 	int n = num_of_lines("Users.txt");
 
 	std::string out;
-	int line = manipulate_at(username);
-	std::ofstream ofs;
-	ofs.open("temp.txt", std::ofstream::out);
 
-	for (int i = 0; i < n; i++)
+	int line = manipulate_at(username);
+
+	getline(oldFile, out);
+	newFile << out << std::endl;
+	for (int i = 1; i < n; i++)
 	{
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 7; j++)
 		{
-			file >> out;
-	
-			if ((i == line) && (j == 5) && (out=="false"))
+			oldFile >> out;
+			if ((i == line) && (j == 5) && (out == "false"))
 			{
-				
-					ofs << "true";
-					check++;
-				
+				newFile << "true";
+				check++;
 			}
 			else
-			{
-				ofs << out <<" ";
-			}
-			
+				newFile << out;
+			if (j != 6)
+				newFile << " ";
 		}
-		ofs << "\n";
+		newFile << std::endl;
 	}
-
-	ofs.close();
-
-	file.close();
+	oldFile.close();
+	newFile.close();
 
 	remove("Users.txt");
 
-	rename("temp.txt", "Users.txt");
+	rename("TempName.txt", "Users.txt");
+
+
 
 	if (check != 0)
 	{
@@ -114,7 +164,7 @@ bool suspend_at(std::string username)
 	{
 		return false;
 	}
-	
+
 }
 
 //AKTIVIRA SUSPEDNOVANI NALOG
@@ -123,47 +173,49 @@ bool activate_at(std::string username)
 
 	int check = 0;
 
-	std::fstream file("Users.txt", std::ios::in);
+	std::fstream oldFile("Users.txt", std::ios::in);
+	std::fstream newFile("TempName.txt", std::ios::out);
 	int n = num_of_lines("Users.txt");
 
 	std::string out;
-	int line = manipulate_at(username);
-	std::ofstream ofs;
-	ofs.open("temp.txt", std::ofstream::out);
 
-	for (int i = 0; i < n; i++)
+	int line = manipulate_at(username);
+
+	getline(oldFile, out);
+	newFile << out << std::endl;
+	for (int i = 1; i < n; i++)
 	{
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 7; j++)
 		{
-			file >> out;
-			if ((i== line) && (j == 5))
+			oldFile >> out;
+			if ((i == line) && (j == 5) && (out == "true"))
 			{
-					ofs << "false";
-					check++;		
+				newFile << "false";
+				check++;
 			}
 			else
-			{
-				ofs << out << " ";
-			}
-
+				newFile << out;
+			if (j != 6)
+				newFile << " ";
 		}
-		ofs << std::endl;
+		newFile << std::endl;
 	}
-
-	ofs.close();
-
-	file.close();
+	oldFile.close();
+	newFile.close();
 
 	remove("Users.txt");
 
-	rename("temp.txt", "Users.txt");
+	rename("TempName.txt", "Users.txt");
 
-	if (check != 0) 
+
+
+	if (check != 0)
 	{
-		return true; 
+		return true;
 	}
 	else
 	{
 		return false;
 	}
+
 }
