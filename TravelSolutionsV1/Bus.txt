@@ -1,3 +1,0 @@
-1 Scania  35  0  0 true
-2 Ford  50  1  1 true
-3 Pezo  50  0  1 true
