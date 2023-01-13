@@ -40,13 +40,13 @@ public:
 		int num;
 		bool check, checkId;
 		std::fstream tourFile;
-		std::cout << "Unesite jedinstveni ID ture:\n";
+		std::cout << "Unesite jedinstveni ID ture. ID moze da bude kombinacija slova i cifara duzine vece od 4.\n";
 		std::cin >> id;
 		do {
 			checkId = check_id_tour(id);
 			if (checkId == true) {
 				tourFile.open("Tours.txt", std::ios::app);
-				tourFile << id << " ";
+				tourFile << id << ",";
 			}
 			else {
 				std::cout << "Zahtijeva se ponovni unos ID-a:\n";
@@ -55,35 +55,28 @@ public:
 		} while (checkId == false);
 		std::cout << "Unesite koliko lokacija ce imati tura:\n";
 		std::cin >> num;
-		tourFile << num << " ";
-		
+		tourFile << num << ",";
 		system("cls");
-		do {
-			std::string location;
-			std::cout << "Unesite lokaciju koju zelite da dodate u turu:\n";
-			std::cin >> location;
+		std::string location;
+		for (int i = 1; i <= num; i++) {
+
+			std::cout << "Unesite " << i << ".lokaciju koju zelite da dodate u turu : \n";
+			if (i != num) {
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			}
+			std::getline(std::cin, location);
 			check = checkLocation(location);
 			if (check == true) {
-				tourFile << location;
-				if (num != 1)
-				{
-					tourFile << ",";
-				}
-				else
-				{
-					tourFile << " ";
-				}
-			    
-				num--;
+				tourFile << location << ",";
 			}
-			else
-				std::cout << "Lokaciju nije moguce dodati u turu.\n";
-		} while (num);
+			else {
+				std::cout << "Lokaciju nije moguce dodati u turu.\n\n";
+				i--;
+			}
 
-		
-		std::cout << "Da li je tura unutar granice drzave? (Unesite Da ili Ne) \n";
+		}
+		std::cout << "Da li je lokacija unutar granica drzave? (Unesite Da ako jeste, a Ne ako nije.)\n";
 		std::cin >> withinBorder;
-
 		if (withinBorder == "Da") {
 			tourFile << "1" << std::endl;
 		}
@@ -91,6 +84,8 @@ public:
 			tourFile << "0" << std::endl;
 		}
 		tourFile.close();
+		system("cls");
+		menu();
 	}
 
     //radi
@@ -140,28 +135,32 @@ public:
 	//radi
 	void addLocation()
 	{
-		std::cout << "\n";
 		std::string location;
-		bool check;
+		bool check = false;
 		std::fstream locationFile;
-		do {
+		int i = 0;
+		do
+		{
+			i++;
 			std::cout << "Unesite lokaciju koju zelite da dodate:\n";
-			std::cin >> location;
-			std::cout << "\n";
+			if (i == 1)
+			{
+				std::cin.ignore();
+			}
+			getline(std::cin, location);
 			check = checkLocation(location);
 			if (check == false) {
-				locationFile.open("Locations.txt", std::ios::app);
-				if (locationFile.is_open())
-					locationFile << location << "\n";
 
+				locationFile.open("Locations.txt", std::ios::app);
+				locationFile << location << "\n";
+				locationFile.close();
 			}
 			else
 			{
-				system("cls");
-				std::cout << "Unesena lokacija vec postoji!!\n";
+				std::cout << "Nije moguce unijeti trazenu lokaciju, ona vec postoji.\n\n";
 			}
 		} while (check == true);
-		locationFile.close();
+		system("cls");
 	}
 
 	void addDrive()
@@ -255,9 +254,9 @@ public:
 		do
 		{
 			std::cout << "\nIzaberite unosenjem broja zeljenu opciju:\n\n";
-			std::cout << "1.) Dodaj podatke\n";
-			std::cout << "2.) Pregledaj podatake i obavjestenja\n";
-			std::cout << "3.) Upravljaj nalozima\n";
+			std::cout << "1.) Dodavanje podataka\n";
+			std::cout << "2.) Pregled podataka i obavjestenja\n";
+			std::cout << "3.) Upravljanje nalozima\n";
 			std::cout << "--> ";
 			std::cin >> option;
 			if (option == "1")
@@ -349,6 +348,7 @@ public:
 			if (option_admin == "1")
 			{
 				registration("3");
+				manipulate();
 			}
 			else if (option_admin == "2")
 			{
@@ -366,6 +366,7 @@ public:
 					system("cls");
 					std::cout << "Korisnik ne postoji ili pokusavate izbrisati administratorski nalog\n";
 				}
+				manipulate();
 			}
 			else if (option_admin == "3")
 			{
@@ -382,6 +383,7 @@ public:
 					system("cls");
 					std::cout << "Korisnik ne postoji ili pokusavate suspendovati administratorski nalog\n";
 				}
+				manipulate();
 			}
 			else if (option_admin == "4")
 			{
@@ -398,6 +400,7 @@ public:
 					system("cls");
 					std::cout << "Korisnik ne postoji ili pokusavate aktivirati nesuspendovan nalog\n";
 				}
+				manipulate();
 			}
 			else if (option_admin == "5")
 			{
@@ -541,17 +544,4 @@ public:
 			//addData();
 		} while (option1 != "1" && option1 != "2" && option1 != "3" && option1 != "4" && option1 != "5");
 	}
-	/*void set_user_type() override
-	{
-		this->user_type = "2";
-	}
-	virtual std::string get_user_type() override
-	{
-		if (this->user_type == "0")
-		{
-			std::cout << "User type still not defined";
-		}
-		return this->user_type;
-	}*/
-
 };

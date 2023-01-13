@@ -49,7 +49,7 @@ bool registration(std::string type)
 	}
 	else if (type == "2")
 	{
-		file << name << " " << surname << " " << username << " " << password << " " << type << "\n";
+		file << name << " " << surname << " " << username << " " << password << " " << type << " 0 0\n";
 	}
 	else if (type == "3")
 	{
@@ -69,7 +69,7 @@ int manipulate_at(std::string username)
 
 	for (int i = 0; i < n; i++)
 	{
-		for (int j = 0; j < 5; j++)
+		for (int j = 0; j < 7; j++)
 		{
 			file >> out;
 			if (out == username)

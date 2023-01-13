@@ -34,7 +34,7 @@ bool check_username(std::string forcheck)
 
 	for (int i = 0; i < n; i++)
 	{
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 7; j++)
 		{
 			file >> out;
 			if ((j == 2) && (out == forcheck))
@@ -99,7 +99,7 @@ std::string getUserType(std::string username)
 	for (int i = 0; i < n; i++)
 	{
 		int check = 0;
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 7; j++)
 		{
 			file >> out;
 			if ((j == 2) && (out == username))
@@ -126,7 +126,7 @@ bool userExist(std::string username, std::string password)
 	for (int i = 0; i < n; i++)
 	{
 		int check = 0;
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 7; j++)
 		{
 			file >> out;
 			if ((j == 2) && (out == username))
@@ -198,7 +198,7 @@ bool check_idBus_exist(std::string id)
 	for (int i = 0; i < n; i++)
 	{
 		int check = 0;
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 7; j++)
 		{
 			bFile >> out;
 			if ((j == 0) && (out == id))
@@ -243,7 +243,7 @@ bool check_is_bus_available(std::string id)
 	for (int i = 0; i < n; i++)
 	{
 		int check = 0;
-		for (int j = 0; j < 6; j++)
+		for (int j = 0; j < 7; j++)
 		{
 			aFile >> out;
 			if ((j == 5) && (id == "true"))
@@ -267,10 +267,9 @@ bool checkLocation(std::string location)
 			if (line == location)
 				check = true;
 		}
-		lFile.close();
-
-		return check;
 	}
+	lFile.close();
+	return check;
 }
 
 //POSTAVLJA STANJE VOZACA NA ZAUZETO
