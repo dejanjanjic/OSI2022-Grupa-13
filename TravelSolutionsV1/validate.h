@@ -39,10 +39,12 @@ bool check_username(std::string forcheck)
 			file >> out;
 			if ((j == 2) && (out == forcheck))
 			{
+				file.close();
 				return 0;
 			}
 		}
 	}
+	file.close();
 	if (forcheck.size() < 4) { return 0; }
 	return 1;
 

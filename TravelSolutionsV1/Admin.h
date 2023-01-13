@@ -245,6 +245,7 @@ public:
 			couponFile << result << "  " << value << "\n";
 			couponFile.close();
 		}
+		
 	}
 
 
