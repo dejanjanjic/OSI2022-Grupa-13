@@ -34,35 +34,39 @@ public:
 		file.close();
 	}
 
+	//radi
 	void addTour()
 	{
 		std::string id, withinBorder;
 		int num;
-		bool check, checkId;
+		bool check, checkId, checkidTourExist;
 		std::fstream tourFile;
-		std::cout << "Unesite jedinstveni ID ture. ID moze da bude kombinacija slova i cifara duzine vece od 4.\n";
-		std::cin >> id;
 		do {
+			std::cout << "Unesite jedinstveni ID ture. ID moze da bude kombinacija slova i cifara duzine vece od 4.\n";
+			std::cin >> id;
 			checkId = check_id_tour(id);
-			if (checkId == true) {
+			checkidTourExist = check_idTour_exist(id);
+			if (checkId == true && checkidTourExist == false) {
 				tourFile.open("Tours.txt", std::ios::app);
 				tourFile << id << ",";
 			}
 			else {
-				std::cout << "Zahtijeva se ponovni unos ID-a:\n";
-				std::cin >> id;
+				std::cout << "Tura vec postoji ili nije dodana u pravilnom obliku.\n\n";
 			}
-		} while (checkId == false);
+		} while (checkId == false || checkidTourExist == true);
 		std::cout << "Unesite koliko lokacija ce imati tura:\n";
 		std::cin >> num;
 		tourFile << num << ",";
 		system("cls");
 		std::string location;
+		int st = 0;
 		for (int i = 1; i <= num; i++) {
-
+			st++;
 			std::cout << "Unesite " << i << ".lokaciju koju zelite da dodate u turu : \n";
-			if (i != num) {
+			if (st == 1) {
+
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
 			}
 			std::getline(std::cin, location);
 			check = checkLocation(location);
@@ -88,14 +92,14 @@ public:
 		menu();
 	}
 
-    //radi
+	//radi
 	void addBus()
 	{
-		std::string id, model, hasWifi, hasWc, isAvailable = "true";
+		std::string id, model, hasWifi, hasWc, Busy = "false";
 		int numOfSeats;
 		bool checkId;
 		std::fstream busFile;
-		std::cout << "Unesite jedinstveni ID busa:\n";
+		std::cout << "Unesite jedinstveni ID busa. ID moze da bude u vidu jedne ili dvije cifre.\n";
 		std::cin >> id;
 		do {
 			checkId = check_id_bus(id) && !check_idBus_exist(id);
@@ -104,7 +108,7 @@ public:
 				busFile << id << " ";
 			}
 			else {
-				std::cout << "Zahtijeva se ponovni unos id-a:\n";
+				std::cout << "Zahtijeva se ponovni unos ID-a:\n";
 				std::cin >> id;
 			}
 		} while (checkId == false);
@@ -124,10 +128,10 @@ public:
 			busFile << "0" << "  ";
 
 		if (hasWc == "Da") {
-			busFile << "1" << " " << isAvailable << std::endl;
+			busFile << "1" << " " << Busy << std::endl;
 		}
 		else
-			busFile << "0" << " " << isAvailable << std::endl;
+			busFile << "0" << " " << Busy << std::endl;
 
 		busFile.close();
 	}
@@ -163,10 +167,11 @@ public:
 		system("cls");
 	}
 
+	//radi
 	void addDrive()
 	{
-		std::string idTour, username, idBus;
-		std::fstream file1, file2, file3;
+		std::string idTour, username, idBus, departureDate, departureTime, arrivalDate, arrivalTime, date, price;
+		std::fstream file1;
 		bool checkId1, checkId2, checkId3;
 		do
 		{
@@ -180,7 +185,7 @@ public:
 
 			}
 			else
-				std::cout << "Uneseni ID ne postoji." << std::endl;
+				std::cout << "Uneseni ID ne postoji.\n" << std::endl;
 
 		} while (checkId1 == false);
 
@@ -191,12 +196,11 @@ public:
 			checkId2 = (check_username_exist(username) && check_is_driver_available(username));
 			if (checkId2)
 			{
-				file2.open("Drive.txt", std::ios::app);
-				file2 << username << " ";
+				file1 << username << " ";
 				driverIsBusy(username);
 			}
 			else
-				std::cout << "Uneseni username ne postoji." << std::endl;
+				std::cout << "Uneseni vozac ne postoji ili je zauzet.\n" << std::endl;
 		} while (checkId2 == false);
 
 		do
@@ -206,15 +210,33 @@ public:
 			checkId3 = (check_idBus_exist(idBus) && check_is_bus_available(idBus));
 			if (checkId3)
 			{
-				file3.open("Drive.txt", std::ios::app);
-				file3 << idBus << std::endl;
+				file1 << idBus << " ";
 				busIsBusy(idBus);
 			}
 			else
-				std::cout << "Uneseni ID ne postoji." << std::endl;
+				std::cout << "Uneseni ID ne postoji ili je bus zauzet.\n" << std::endl;
 
 		} while (checkId3 == false);
 
+		std::cout << "Unesite datum polaska(format day.month.year):\n";
+		std::cin >> date;
+		file1 << date << " ";
+		std::cout << "Unesite vrijeme polaska(format hour:minutes):\n";
+		std::cin >> date;
+		file1 << date << " ";
+		std::cout << "Unesite datum dolaska(format day.month.year):\n";
+		std::cin >> date;
+		file1 << date << " ";
+		std::cout << "Unesite vrijeme dolaska(formet hour:minutes):\n";
+		std::cin >> date;
+		file1 << date << " ";
+		std::cout << "Unesite koliko ce iznositi cijena jedne karte:\n";
+		std::cin >> price;
+		file1 << price << " ";
+		file1 << numberOfFreePlaces(idBus) << "\n";
+		file1.close();
+		system("cls");
+		menu();
 	}
 
 

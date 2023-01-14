@@ -151,20 +151,16 @@ bool check_idTour_exist(std::string id)
 {
 	std::fstream tFile("Tours.txt", std::ios::in);
 	int n = num_of_lines("Tours.txt");
-	std::string out1, out2, out3;
-	for (int i = 0; i < n; i++)
-	{
-		tFile >> out1;
-		if (out1 == id)
+	std::string out, out1;
+	while (n) {
+		getline(tFile, out, ',');
+		getline(tFile, out1);
+		if (out == id)
 			return true;
-		tFile >> out2;
-		int x = stoi(out2);
-		int y = x + 3;
-		for (int j = 0; j < y; j++)
-		{
-			tFile >> out3;
-		}
+		n--;
 	}
+	tFile.close();
+
 	return false;
 }
 
@@ -174,6 +170,7 @@ bool check_username_exist(std::string username)
 	std::fstream uFile("Users.txt", std::ios::in);
 	int n = num_of_lines("Users.txt");
 	std::string out;
+	getline(uFile, out);
 	for (int i = 0; i < n; i++)
 	{
 		int check = 0;
@@ -188,10 +185,11 @@ bool check_username_exist(std::string username)
 				return true;
 		}
 	}
+	uFile.close();
 	return false;
 }
 
-//PROVJERA DA LI BUS POSTOJI
+///PROVJERA DA LI BUS POSTOJI
 bool check_idBus_exist(std::string id)
 {
 	std::fstream bFile("Bus.txt", std::ios::in);
@@ -200,7 +198,7 @@ bool check_idBus_exist(std::string id)
 	for (int i = 0; i < n; i++)
 	{
 		int check = 0;
-		for (int j = 0; j < 7; j++)
+		for (int j = 0; j < 6; j++)
 		{
 			bFile >> out;
 			if ((j == 0) && (out == id))
@@ -209,6 +207,7 @@ bool check_idBus_exist(std::string id)
 				return true;
 		}
 	}
+	bFile.close();
 	return false;
 
 }
@@ -241,17 +240,19 @@ bool check_is_bus_available(std::string id)
 {
 	std::fstream aFile("Bus.txt", std::ios::in);
 	int n = num_of_lines("Bus.txt");
-	std::string out;
+	std::string out, tmp;
 	for (int i = 0; i < n; i++)
 	{
-		int check = 0;
-		for (int j = 0; j < 7; j++)
+		for (int j = 0; j < 6; j++)
 		{
 			aFile >> out;
-			if ((j == 5) && (id == "true"))
+			if (j == 0 && out == id)
+				tmp = out;
+			if ((j == 5) && (out == "false") && tmp == id)
 				return true;
 		}
 	}
+	aFile.close();
 	return false;
 }
 
@@ -274,67 +275,133 @@ bool checkLocation(std::string location)
 	return check;
 }
 
+// VRACA LINIJU U KOJOJ SE NALAZE INFORMACIJE O VOZACU
+int getLineWithDriver(std::string username)
+{
+	std::fstream filedriver("Users.txt", std::ios::in);
+	int n = num_of_lines("Users.txt");
+
+	std::string out;
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			filedriver >> out;
+			if (out == username)
+			{
+				return i;
+			}
+		}
+	}
+	filedriver.close();
+	return 0;
+}
+
+
+//VRACA LINIJU U KOJOJ SE NALAZE INFORMACIJE O BUSU
+int getLineWithBus(std::string id)
+{
+	std::fstream filebus("Bus.txt", std::ios::in);
+	int n = num_of_lines("Bus.txt");
+
+	std::string out;
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			filebus >> out;
+			if (out == id)
+			{
+				return i;
+			}
+		}
+	}
+	filebus.close();
+	return 0;
+}
+
 //POSTAVLJA STANJE VOZACA NA ZAUZETO
 void driverIsBusy(std::string username)
 {
-	std::fstream drFile("Users.txt", std::ios::in);
+	std::fstream oldfiles("Users.txt", std::ios::in);
+	std::fstream newfiles("TempDriver.txt", std::ios::app);
 	int n = num_of_lines("Users.txt");
-	std::string string1, string2, string3, string4, string5, string6, string7;
-	bool check = false;
+	int line = getLineWithDriver(username);
+	std::string out;
 	for (int i = 0; i < n; i++)
 	{
-		drFile >> string1;
-		drFile >> string2;
-		drFile >> string3;
-		if (string3 == username)
-			check = true;
-		drFile >> string4;
-		drFile >> string5;
-		drFile >> string6;
-		drFile >> string7;
-		drFile << string1;
-		drFile << string2;
-		drFile << string3;
-		drFile << string4;
-		drFile << string5;
-		drFile << string6;
-		if (check)
-			drFile << "true";
-		drFile << string7;
-
+		for (int j = 0; j < 7; j++)
+		{
+			oldfiles >> out;
+			if ((i == line) && (j == 6))
+			{
+				newfiles << "true";
+			}
+			else
+				newfiles << out;
+			if (j != 6)
+				newfiles << " ";
+		}
+		newfiles << std::endl;
 	}
+
+	oldfiles.close();
+	newfiles.close();
+	remove("Users.txt");
+	rename("TempDriver.txt", "Users.txt");
+
 }
 
-//POSTAVLJA BUS NA STANJE GDJE JE NEDOSTUPAN
+//POSTAVLJA BUS NA ZAUZETO
 void busIsBusy(std::string id)
 {
-	std::fstream bFile("Bus.txt", std::ios::in);
+	std::fstream oldfile("Bus.txt", std::ios::in);
+	std::fstream newfile("TempBus.txt", std::ios::app);
 	int n = num_of_lines("Bus.txt");
-	std::string s1, s2, s3, s4, s5, s6;
-	bool check = false;
+	int line = getLineWithBus(id);
+	std::string out;
 	for (int i = 0; i < n; i++)
 	{
-
-		bFile >> s1;
-		if (s1 == id)
-			check == true;
-		bFile >> s2;
-		bFile >> s3;
-		bFile >> s4;
-		bFile >> s5;
-		bFile >> s6;
-		bFile << s1;
-		bFile << s2;
-		bFile << s3;
-		bFile << s4;
-		bFile << s5;
-		if (check)
-			bFile << "false";
-		else
-			bFile << s6;
-
+		for (int j = 0; j < 6; j++)
+		{
+			oldfile >> out;
+			if ((i == line) && (j == 5))
+			{
+				newfile << "true";
+			}
+			else
+				newfile << out;
+			if (j != 5)
+				newfile << " ";
+		}
+		newfile << std::endl;
 	}
+	oldfile.close();
+	newfile.close();
+	remove("Bus.txt");
+	rename("TempBus.txt", "Bus.txt");
 }
 
+
+//VRACA BROJ MJESTA U BUSU KOJI CE BITI ISKORISTENI ZA DODAVANJE VOZNJE
+std::string numberOfFreePlaces(std::string id)
+{
+	std::fstream dat("Bus.txt", std::ios::in);
+	int n = num_of_lines("Bus.txt");
+	int numOfLine = getLineWithBus(id);
+	std::string out;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			dat >> out;
+			if ((i == numOfLine) && (j == 2))
+				return out;
+		}
+	}
+	dat.close();
+}
 
 
