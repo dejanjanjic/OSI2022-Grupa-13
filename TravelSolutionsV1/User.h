@@ -1,5 +1,9 @@
 #pragma once
 #include <fstream>
+#include <ctime>
+#include <sstream>
+#include <chrono>
+#include<iomanip>
 #include "Person.h"
 
 class User : public Person
@@ -37,9 +41,10 @@ public:
 		}
 		file.close();
 	}
-	
+
 	void menu()
 	{
+		printDrives();
 		std::string option;
 		do
 		{
@@ -50,7 +55,20 @@ public:
 			std::cin >> option;
 			if (option == "1")
 			{
-				std::cout << "Kasnije" <<std::endl;
+
+				searchDrive();
+				std::string option2;
+				do
+				{
+					std::cout << "\n\nOdaberite opciju unosem broja:\n";
+					std::cout << "1.) Vrati nazad\n";
+					std::cin >> option2;
+					if (option == "1")
+					{
+						system("cls");
+						menu();
+					}
+				} while (option2 != "1");
 			}
 			else if (option == "2")
 			{
@@ -58,6 +76,149 @@ public:
 			}
 
 		} while (option != "1" && option != "2");
+	}
+
+	void printDrives()
+	{
+		std::string id, line, locations, inside_string;
+		bool inside;
+		std::fstream uFile("Tours.txt", std::ios::in);
+		if (uFile.is_open())
+		{
+			while (getline(uFile, id, ',') && getline(uFile, locations, ',') && getline(uFile, inside_string))
+			{
+				int num_locations = atoi(locations.c_str());
+				//std::cout << id;
+				int last_number;
+				if (isdigit(inside_string[inside_string.size() - 1]))
+				{
+					last_number = stoi(std::string(1, inside_string[inside_string.size() - 1]));
+				}
+				if (inside_string.size() > 1)
+				{
+					inside_string.erase(inside_string.size() - 2, 2);
+				}
+
+				std::fstream  dfile("Drive.txt", std::ios::in);
+				std::string line1;
+				if (dfile.is_open())
+				{
+					while (getline(dfile, line1))
+					{
+						if (line1.find(id) != std::string::npos)
+						{
+							std::string  date1, date2, time1, time2, driver, did, price;
+							std::stringstream ss(line1);
+							ss >> line1 >> driver >> did >> date1 >> time1 >> date2 >> time2 >> price;
+							std::string format_datuma = "%d.%m.%Y.";
+							std::string format_vremena = "%H:%M";
+
+							std::tm datum = {};
+							std::istringstream ss_datum(date1);
+							ss_datum >> std::get_time(&datum, format_datuma.c_str());
+
+							std::tm vrijeme = {};
+							std::istringstream ss_vrijeme(time1);
+							ss_vrijeme >> std::get_time(&vrijeme, format_vremena.c_str());
+
+							datum.tm_hour = vrijeme.tm_hour;
+							datum.tm_min = vrijeme.tm_min;
+
+							std::time_t unix_time = std::mktime(&datum);
+							std::chrono::system_clock::time_point time_point = std::chrono::system_clock::from_time_t(unix_time);
+
+							auto current_time = std::chrono::system_clock::now();
+							if (time_point > current_time)
+							{
+								std::cout << "\nPostoje sljedece voznje, stanice su u:\n";
+								std::cout << inside_string;
+								std::cout << std::endl;
+								std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
+								std::cout << "Datum i vrijeme dolaska: " << date2 << " " << time2 << std::endl;
+								std::cout << "ID ture: " << did << std::endl;
+								std::cout << "Putovanje je ";
+								if (last_number == 1) std::cout << "unutar granica drzave. Pasos nije neophodan.";
+								else if (last_number == 0) std::cout << "izvan granica drzave. Pasos je neophodan.";
+								std::cout << std::endl;
+							}
+						}
+					}
+				}
+				dfile.close();
+			}
+
+		}
+		uFile.close();
+	}
+
+	void searchDrive()
+	{
+		system("cls");
+		std::string Ilocation;
+		std::cout << "Unesite lokaciju za pretragu:\n";
+		std::cout << "-->";
+		std::cin >> Ilocation;
+		bool check = checkLocation(Ilocation);
+		if (check == true)
+		{
+			std::string id, line, locations, inside_string;
+			bool inside;
+			std::fstream uFile("Tours.txt", std::ios::in);
+			if (uFile.is_open())
+			{
+				while (getline(uFile, id, ',') && getline(uFile, locations, ',') && getline(uFile, inside_string))
+				{
+					int num_locations = atoi(locations.c_str());
+					//std::cout << id;
+					int last_number;
+					if (isdigit(inside_string[inside_string.size() - 1]))
+					{
+						last_number = stoi(std::string(1, inside_string[inside_string.size() - 1]));
+					}
+					if (inside_string.size() > 1)
+					{
+						inside_string.erase(inside_string.size() - 2, 2);
+					}
+					if (inside_string.find(Ilocation) != std::string::npos)
+					{
+						std::fstream  dfile("Drive.txt", std::ios::in);
+						std::string line1;
+						if (dfile.is_open())
+						{
+							while (getline(dfile, line1))
+							{
+								if (line1.find(id) != std::string::npos)
+								{
+									std::string  date1, date2, time1, time2, driver, did, price;
+									std::stringstream ss(line1);
+									ss >> line1 >> driver >> did >> date1 >> time1 >> date2 >> time2 >> price;
+									std::cout << "\nPostoje sljedece voznje, stanice su u:\n";
+									std::cout << inside_string;
+									std::cout << std::endl;
+									std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
+									std::cout << "Datum i vrijeme dolaska: " << date2 << " " << time2 << std::endl;
+									std::cout << "ID ture: " << did << std::endl;
+									std::cout << "Putovanje je ";
+									if (last_number == 1) std::cout << "unutar granica drzave. Pasos nije neophodan.";
+									else if (last_number == 0) std::cout << "izvan granica drzave. Pasos je neophodan.";
+									std::cout << std::endl;
+
+								}
+							}
+						}
+						dfile.close();
+
+					}
+
+				}
+
+			}
+			uFile.close();
+		}
+		else
+		{
+			std::cout << "Ne postoji takva lokacija\n";
+		}
 	}
 
 	void insertCoupon()
@@ -85,7 +246,7 @@ public:
 					lineOfCoupon = i;
 					check++;
 					//cita se vrijednost bona
-					
+
 					dValue = stod(value);
 					this->balance += dValue;
 
@@ -122,7 +283,7 @@ public:
 					remove("Users.txt");
 
 					rename("TempName.txt", "Users.txt");
-					
+
 				}
 				else
 				{
@@ -146,7 +307,7 @@ public:
 			}
 			else
 			{
-				
+
 				std::string option;
 				do
 				{
@@ -166,7 +327,7 @@ public:
 						system("cls");
 						menu();
 					}
-				}while(option != "1" || option != "2");
+				} while (option != "1" || option != "2");
 
 			}
 
