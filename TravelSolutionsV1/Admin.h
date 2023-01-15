@@ -38,31 +38,34 @@ public:
 	{
 		std::string id, withinBorder;
 		int num;
-		bool check, checkId;
+		bool check, checkId, checkidTourExist;
 		std::fstream tourFile;
-		std::cout << "Unesite jedinstveni ID ture. ID moze da bude kombinacija slova i cifara duzine vece od 4.\n";
-		std::cin >> id;
 		do {
+			std::cout << "Unesite jedinstveni ID ture. ID moze da bude kombinacija slova i cifara duzine vece od 4.\n";
+			std::cin >> id;
 			checkId = check_id_tour(id);
-			if (checkId == true) {
+			checkidTourExist = check_idTour_exist(id);
+			if (checkId == true && checkidTourExist == false) {
 				tourFile.open("Tours.txt", std::ios::app);
 				tourFile << id << ",";
 			}
 			else {
-				std::cout << "Zahtijeva se ponovni unos ID-a:\n";
-				std::cin >> id;
+				std::cout << "Tura vec postoji ili nije dodana u pravilnom obliku.\n\n";
 			}
-		} while (checkId == false);
+		} while (checkId == false || checkidTourExist == true);
 		std::cout << "Unesite koliko lokacija ce imati tura:\n";
 		std::cin >> num;
 		tourFile << num << ",";
 		system("cls");
 		std::string location;
+		int st = 0;
 		for (int i = 1; i <= num; i++) {
-
+			st++;
 			std::cout << "Unesite " << i << ".lokaciju koju zelite da dodate u turu : \n";
-			if (i != num) {
+			if (st == 1) {
+
 				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
 			}
 			std::getline(std::cin, location);
 			check = checkLocation(location);
@@ -191,8 +194,7 @@ public:
 			checkId2 = (check_username_exist(username) && check_is_driver_available(username));
 			if (checkId2)
 			{
-				file2.open("Drive.txt", std::ios::app);
-				file2 << username << " ";
+				file1 << username << " ";
 				driverIsBusy(username);
 			}
 			else
@@ -206,8 +208,7 @@ public:
 			checkId3 = (check_idBus_exist(idBus) && check_is_bus_available(idBus));
 			if (checkId3)
 			{
-				file3.open("Drive.txt", std::ios::app);
-				file3 << idBus << std::endl;
+				file1 << idBus << std::endl;
 				busIsBusy(idBus);
 			}
 			else
@@ -215,6 +216,8 @@ public:
 
 		} while (checkId3 == false);
 
+		system("cls");
+		menu();
 	}
 
 
