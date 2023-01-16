@@ -80,7 +80,7 @@ bool check_idDrive_exist(std::string forcheck)
 		int n = num_of_lines("Drive.txt");
 		std::string out, out1;
 		while (n) {
-			getline(tFile, out, ',');
+			tFile >> out;
 			getline(tFile, out1);
 			if (out == forcheck)
 				return true;
