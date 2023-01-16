@@ -116,7 +116,7 @@ public:
 			}
 		} while (option != "1" && option != "2" && option != "3");
 	}
-	
+
 	void dodajIzvjestaj(bool odvezeno)
 	{
 		if (odvezeno == false)
@@ -171,7 +171,7 @@ public:
 							auto current_time = std::chrono::system_clock::now();
 							auto time_diff = std::chrono::duration_cast<std::chrono::hours>(current_time - time_point2);
 
-							if (time_diff.count() > 24) 
+							if (time_diff.count() > 24)
 							{
 								std::cout << "Izvjestaj nije dodan u naredna 24h od datuma i vremena voznje.\n";
 							}
@@ -322,11 +322,11 @@ public:
 						}
 					}uFile.close();
 				}
-				else 
+				else
 				{
 					odvozeno = false;
 				}
-				
+
 			}
 		}dfile.close();
 		if (odvozeno == false)
@@ -392,7 +392,7 @@ public:
 								auto current_time = std::chrono::system_clock::now();
 								if (time_point > current_time)
 								{
-									std::cout << "\nPostoji sljedeca voznja: "<<driveID<<"\n";
+									std::cout << "\nPostoji sljedeca voznja: " << driveID << "\n";
 									std::cout << inside_string;
 									std::cout << std::endl;
 									std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
