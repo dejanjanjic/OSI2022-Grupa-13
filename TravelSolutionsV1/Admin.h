@@ -320,32 +320,32 @@ public:
 					if (option2 == "1")
 					{
 						system("cls");
-						//tourOverview();
+						tourOverview();
 					}
 					else if (option2 == "2")
 					{
 						system("cls");
-						//busOverview();
+						busOverview();
 					}
 					else if (option2 == "3")
 					{
 						system("cls");
-						//locationOverview();
+						locationOverview();
 					}
 					else if (option2 == "4")
 					{
 						system("cls");
-						//driveOverview();
+						driveOverview();
 					}
 					else if (option2 == "5")
 					{
 						system("cls");
-						//couponOverview();
+						couponOverview();
 					}
 					else if (option2 == "6")
 					{
 						system("cls");
-						//notificationOverview();
+						notificationOverview();
 					}
 					else if (option2 == "7")
 					{
@@ -581,5 +581,130 @@ public:
 			}
 			//addData();
 		} while (option1 != "1" && option1 != "2" && option1 != "3" && option1 != "4" && option1 != "5");
+	}
+	void busOverview()
+	{
+		std::fstream file;
+		std::string line;
+		file.open("Bus.txt", std::ios::in);
+		std::cout << "ID autobusa:" << " - " << "Model autobusa:" << " - " << "Broj sjedista:" << " - " << "\n" << "Autobus ima WiFi? (1-DA,0-NE)" << " - " << "Autobus ima WC? (1-DA,0-NE)" << "\n";
+		if (file.is_open())
+		{
+			while (std::getline(file, line))
+			{
+				std::cout << line<< "\n";
+			}
+		}
+		else
+		{
+			std::cout << "Neuspjesno citanje iz fajla sa autobusima.";
+		}
+		file.close();
+		menu();
+	}
+
+	void locationOverview()
+	{
+		std::fstream file;
+		std::string line;
+		file.open("Locations.txt", std::ios::in);
+		std::cout << "Lokacije:" << "\n";
+		if (file.is_open())
+		{
+			while (std::getline(file, line))
+			{
+				std::cout << line << "\n";
+			}
+		}
+		else
+		{
+			std::cout << "Neuspjesno citanje iz fajla sa lokacijama.";
+		}
+		file.close();
+		menu();
+	}
+
+	void couponOverview()
+	{
+
+		std::fstream file;
+		std::string line;
+		file.open("Coupons.txt", std::ios::in);
+		std::cout << "ID bona:" << "         " << "Vrijednost bona:" << "\n";
+		if (file.is_open())
+		{
+			while (std::getline(file, line))
+			{
+				std::cout << line << "KM" << "\n";
+			}
+		}
+		else
+		{
+			std::cout << "Neuspjesno citanje iz fajla sa bonovima";
+		}
+		file.close();
+		menu();
+
+	}
+
+	void driveOverview()
+	{
+		std::string line;
+		std::fstream file;
+		file.open("Drive.txt", std::ios::in);
+		std::cout << "ID ture:" << " - " << "Ime vozaca:" << " - " << "ID autobusa:" << " - " << "Datum polaska:" << " - " << "Vrijeme polaska:" << "Datum dolaska:" << " - " << "Vrijeme dolaska:" << " - " << "Cijena karte:" << " - " << "Broj sjedista:" << std::endl;
+		if (file.is_open())
+		{
+			while (getline(file, line))
+			{
+				std::cout << line << std::endl;
+			}
+			file.close();
+		}
+		else std::cout << "Neuspjesno citanje iz fajla sa voznjama.";
+		menu();
+	}
+
+	void tourOverview()
+	{
+		std::fstream file;
+		std::string line;
+		file.open("Tours.txt", std::ios::in);
+		std::cout << "ID ture:" << " - " << "Broj lokacija:" << " - " <<"\n"<< "lokacije:" << " - " << "Tura unutar granica(1-Da,0-Ne)" << "\n";
+		if (file.is_open())
+		{
+			while (std::getline(file, line))
+			{
+				std::cout << line << "\n";
+			}
+		}
+		else {
+			std::cout << "Neuspjesno citanje iz fajla sa turama";
+		}
+		file.close();
+		menu();
+	}
+	void notificationOverview()
+	{
+
+		std::fstream file;
+		std::string line;
+		file.open("Incidentes.txt", std::ios::in);
+		std::cout << "ID ture za koju se prijavljuje incident" << " - " << "Podaci o incidentu" << "\n";
+			if (file.is_open())
+			{
+				while (std::getline(file, line))
+				{
+					std::cout << line << "\n";
+				}
+			}
+		else {
+			std::cout << "Neuspjesno citanje iz fajla sa turama";
+		}
+		file.close();
+		menu();
+
+
+
 	}
 };
