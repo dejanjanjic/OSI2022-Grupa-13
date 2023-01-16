@@ -34,7 +34,6 @@ void login()
 
 	do
 	{
-
 		std::cout << "Unesite vase korisnicko ime: \n";
 		std::cin >> username;
 		std::cout << "Unesite vasu lozinku: \n";
@@ -65,6 +64,7 @@ void login()
 			}
 			else if (type == "3")
 			{
+
 				system("cls");
 				//Admin se ulogovao na sistem, kreira se objekat
 				Driver vozac(username);

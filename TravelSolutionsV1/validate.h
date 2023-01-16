@@ -64,6 +64,34 @@ bool check_password(std::string forcheck)
 	return 0;
 }
 
+//PROVJERA VALIDNOSTI ID-A VOZNJE
+bool check_idDrive_exist(std::string forcheck)
+{
+	if (forcheck.size() == 5)
+	{
+		for (int i = 0; i < forcheck.size(); i++)
+		{
+			if (!isdigit(forcheck[i]))
+			{
+				return true;
+			}
+		}
+		std::fstream tFile("Drive.txt", std::ios::in);
+		int n = num_of_lines("Drive.txt");
+		std::string out, out1;
+		while (n) {
+			getline(tFile, out, ',');
+			getline(tFile, out1);
+			if (out == forcheck)
+				return true;
+			n--;
+		}
+		tFile.close();
+		return false;
+	}
+
+	return true;
+}
 //PROVJERA VALIDNOSTI ID-A TURE
 bool check_id_tour(std::string forcheck)
 {

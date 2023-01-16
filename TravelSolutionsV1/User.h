@@ -55,7 +55,6 @@ public:
 			std::cin >> option;
 			if (option == "1")
 			{
-
 				searchDrive();
 				std::string option2;
 				do
@@ -63,7 +62,7 @@ public:
 					std::cout << "\n\nOdaberite opciju unosem broja:\n";
 					std::cout << "1.) Vrati nazad\n";
 					std::cin >> option2;
-					if (option == "1")
+					if (option2 == "1")
 					{
 						system("cls");
 						menu();
@@ -74,8 +73,8 @@ public:
 			{
 				insertCoupon();
 			}
-
 		} while (option != "1" && option != "2");
+
 	}
 
 	void printDrives()
@@ -107,9 +106,9 @@ public:
 					{
 						if (line1.find(id) != std::string::npos)
 						{
-							std::string  date1, date2, time1, time2, driver, did, price;
+							std::string driveID,tourID, date1, date2, time1, time2, driver, busID, price,numSeats;
 							std::stringstream ss(line1);
-							ss >> line1 >> driver >> did >> date1 >> time1 >> date2 >> time2 >> price;
+							ss >> driveID>>tourID>> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats;
 							std::string format_datuma = "%d.%m.%Y.";
 							std::string format_vremena = "%H:%M";
 
@@ -130,15 +129,17 @@ public:
 							auto current_time = std::chrono::system_clock::now();
 							if (time_point > current_time)
 							{
-								std::cout << "\nPostoje sljedece voznje, stanice su u:\n";
+								std::cout << "\nID voznje: "<<driveID<<std::endl;
 								std::cout << inside_string;
 								std::cout << std::endl;
 								std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
 								std::cout << "Datum i vrijeme dolaska: " << date2 << " " << time2 << std::endl;
-								std::cout << "ID ture: " << did << std::endl;
 								std::cout << "Putovanje je ";
-								if (last_number == 1) std::cout << "unutar granica drzave. Pasos nije neophodan.";
-								else if (last_number == 0) std::cout << "izvan granica drzave. Pasos je neophodan.";
+								if (last_number == 1) std::cout << "unutar granica drzave. Pasos nije neophodan.\n";
+								else if (last_number == 0) std::cout << "izvan granica drzave. Pasos je neophodan.\n";
+								std::cout << "Cijena karte: " << price << "KM\n";
+								if (numSeats == "0") std::cout << "Nema slobodnih mjesta.\n";
+								else std::cout << "Preostalih mjesta: " << numSeats;
 								std::cout << std::endl;
 							}
 						}
@@ -157,7 +158,8 @@ public:
 		std::string Ilocation;
 		std::cout << "Unesite lokaciju za pretragu:\n";
 		std::cout << "-->";
-		std::cin >> Ilocation;
+		std::cin.ignore();
+		getline(std::cin, Ilocation);
 		bool check = checkLocation(Ilocation);
 		if (check == true)
 		{
@@ -187,21 +189,46 @@ public:
 						{
 							while (getline(dfile, line1))
 							{
+
 								if (line1.find(id) != std::string::npos)
 								{
-									std::string  date1, date2, time1, time2, driver, did, price;
+									std::string  driveID,tourID,date1, date2, time1, time2, driver, busID, price, numSeats;
 									std::stringstream ss(line1);
-									ss >> line1 >> driver >> did >> date1 >> time1 >> date2 >> time2 >> price;
-									std::cout << "\nPostoje sljedece voznje, stanice su u:\n";
-									std::cout << inside_string;
-									std::cout << std::endl;
-									std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
-									std::cout << "Datum i vrijeme dolaska: " << date2 << " " << time2 << std::endl;
-									std::cout << "ID ture: " << did << std::endl;
-									std::cout << "Putovanje je ";
-									if (last_number == 1) std::cout << "unutar granica drzave. Pasos nije neophodan.";
-									else if (last_number == 0) std::cout << "izvan granica drzave. Pasos je neophodan.";
-									std::cout << std::endl;
+									ss >> driveID >>tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats;
+									std::string format_datuma = "%d.%m.%Y.";
+									std::string format_vremena = "%H:%M";
+
+									std::tm datum = {};
+									std::istringstream ss_datum(date1);
+									ss_datum >> std::get_time(&datum, format_datuma.c_str());
+
+									std::tm vrijeme = {};
+									std::istringstream ss_vrijeme(time1);
+									ss_vrijeme >> std::get_time(&vrijeme, format_vremena.c_str());
+
+									datum.tm_hour = vrijeme.tm_hour;
+									datum.tm_min = vrijeme.tm_min;
+
+									std::time_t unix_time = std::mktime(&datum);
+									std::chrono::system_clock::time_point time_point = std::chrono::system_clock::from_time_t(unix_time);
+
+									auto current_time = std::chrono::system_clock::now();
+									if (time_point > current_time)
+									{
+
+										std::cout << "\nID voznje:" << driveID << ":\n";
+										std::cout << inside_string;
+										std::cout << std::endl;
+										std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
+										std::cout << "Datum i vrijeme dolaska: " << date2 << " " << time2 << std::endl;
+										std::cout << "Putovanje je ";
+										if (last_number == 1) std::cout << "unutar granica drzave. Pasos nije neophodan.\n";
+										else if (last_number == 0) std::cout << "izvan granica drzave. Pasos je neophodan.\n";
+										std::cout << "Cijena jedne karte: " << price << "KM\n";
+										if (numSeats == "0") std::cout << "Nema slobodnih mjesta.\n";
+										else std::cout << "Prostalih mjesta: " << numSeats;
+										std::cout << std::endl;
+									}
 
 								}
 							}

@@ -167,12 +167,27 @@ public:
 		system("cls");
 	}
 
-	//radi
+	
 	void addDrive()
 	{
-		std::string idTour, username, idBus, departureDate, departureTime, arrivalDate, arrivalTime, date, price;
+		std::string idTour, username, idBus, date, price, driveID;
 		std::fstream file1;
-		bool checkId1, checkId2, checkId3;
+		bool checkId1, checkId2, checkId3,checkId4;
+
+		do
+		{
+			std::cout << "Unesite jedinstveni ID voznje (5 cifara):\n";
+			std::cin >> driveID;
+			checkId4 = !(check_idDrive_exist(driveID));
+			if (checkId4)
+			{
+				file1.open("Drive.txt", std::ios::app);
+				file1 << driveID << " ";
+			}
+			else
+				std::cout << "Uneseni ID vec postoji.\n" << std::endl;
+		} while (checkId4 == false);
+
 		do
 		{
 			std::cout << "Unesite jedinstveni ID ture:\n";
@@ -180,7 +195,7 @@ public:
 			checkId1 = check_idTour_exist(idTour);
 			if (checkId1)
 			{
-				file1.open("Drive.txt", std::ios::app);
+				//file1.open("Drive.txt", std::ios::app);
 				file1 << idTour << " ";
 
 			}
@@ -230,10 +245,10 @@ public:
 		std::cout << "Unesite vrijeme dolaska(formet hour:minutes):\n";
 		std::cin >> date;
 		file1 << date << " ";
-		std::cout << "Unesite koliko ce iznositi cijena jedne karte:\n";
+		std::cout << "Unesite koliko ce iznositi cijena jedne karte u KM:\n";
 		std::cin >> price;
 		file1 << price << " ";
-		file1 << numberOfFreePlaces(idBus) << "\n";
+		file1 << numberOfFreePlaces(idBus) << " 0" << "\n"; //Dodata 0 na kraju koja oznacava da li je izvjestaj popunjen
 		file1.close();
 		system("cls");
 		menu();
