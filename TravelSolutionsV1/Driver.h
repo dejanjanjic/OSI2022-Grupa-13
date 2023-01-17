@@ -44,7 +44,7 @@ public:
 		}
 	}
 
-	void menu()
+	int menu()
 	{
 		printNextForDriver();
 		std::string option;
@@ -54,6 +54,7 @@ public:
 			std::cout << "1.) Pregled zavrsenih voznji\n";
 			std::cout << "2.) Prijava incidenta\n";
 			std::cout << "3.) Dodavanje izvjestaja\n";
+			std::cout << "4.) Odjavi se\n";
 			std::cout << "-->";
 			std::cin >> option;
 			if (option == "1")
@@ -109,6 +110,11 @@ public:
 						menu();
 					}
 				} while (option2 != "1");
+			}
+			else if (option == "4")
+			{
+				system("cls");
+				return 1;
 			}
 			else
 			{

@@ -11,22 +11,22 @@
 //FUNKCIJA ZA REGISTRACIJU, PARAMETAR TYPE ODREDJUJE KAKAV NALOG CE SE NAPRAVITI "1" ZA KORISNICKI, "2" ZA ADMIN, "3" ZA VOZACKI, UNUTRA IMAJU SVE VALIDACIJE ITD
 bool registration(std::string type);
 //FUNKCIJA ZA LOGIN KOJA VRACA ODREDJENI OBJEKAT NA OSNOVU TIPA
-void login();
+int login();
 //FUNKCIJA ZA PRVU PRIJAVU
 void firstLogin();
 //FUNKCIJA KOJA DAJE POCETNI EKRAN PRI PALJENJU APLIKACIJE
-void startPage();
+int startPage();
 
 
 int main()
 {
-	startPage();
+	while(startPage());
 	return 0;
 }
 
 
 
-void login()
+int login()
 {
 	std::string username, password;
 	system("cls");
@@ -53,14 +53,14 @@ void login()
 				system("cls");
 				//Korisnik se ulogovao na sistem, kreira se objekat
 				User user(username);
-				user.menu();
+				return user.menu();
 			}
 			else if (type == "2")
 			{
 				system("cls");
 				//Admin se ulogovao na sistem, kreira se objekat
 				Admin admin(username);
-				admin.menu();
+				return admin.menu();
 			}
 			else if (type == "3")
 			{
@@ -68,7 +68,7 @@ void login()
 				system("cls");
 				//Admin se ulogovao na sistem, kreira se objekat
 				Driver vozac(username);
-				vozac.menu();
+				return vozac.menu();
 			}
 		}
 
@@ -110,7 +110,7 @@ void firstLogin()
 }
 
 //METODA KOJA DAJE POCETNI EKRAN PRI PALJENJU APLIKACIJE
-void startPage()
+int startPage()
 {
 	std::ifstream usersFile("Users.txt");
 	std::string temp;
@@ -137,7 +137,7 @@ void startPage()
 			if (option == "1")
 			{
 				system("cls");
-				login();
+				return login();
 			}
 			else if (option == "2")
 			{
@@ -146,7 +146,10 @@ void startPage()
 				startPage();
 			}
 			else if (option == "3")
+			{
+				system("cls");
 				exit(0);
+			}
 			else
 			{
 				system("cls");

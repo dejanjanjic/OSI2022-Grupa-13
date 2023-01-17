@@ -286,7 +286,7 @@ public:
 	}
 
 
-	void menu()
+	int menu()
 	{
 		std::string option;
 		do
@@ -295,6 +295,8 @@ public:
 			std::cout << "1.) Dodavanje podataka\n";
 			std::cout << "2.) Pregled podataka i obavjestenja\n";
 			std::cout << "3.) Upravljanje nalozima\n";
+			std::cout << "4.) Odjavi se\n";
+
 			std::cout << "--> ";
 			std::cin >> option;
 			if (option == "1")
@@ -363,8 +365,13 @@ public:
 			{
 			manipulate();
 			}
+			else if (option == "4")
+			{
+				system("cls");
+				return 1;
+			}
 
-		} while (option != "1" && option != "2" && option != "3");
+		} while (option != "1" && option != "2" && option != "3" && option != "4");
 
 	}
 

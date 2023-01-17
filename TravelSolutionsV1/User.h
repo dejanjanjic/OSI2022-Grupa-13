@@ -42,7 +42,7 @@ public:
 		file.close();
 	}
 
-	void menu()
+	int menu()
 	{
 		std::cout << "Vase stanje na racunu: " << this->balance << "KM" << std::endl << std::endl;
 		printDrives();
@@ -53,6 +53,8 @@ public:
 			std::cout << "1.) Pretrazivanje voznji\n";
 			std::cout << "2.) Unos poklon bona\n";
 			std::cout << "3.) Kupi kartu\n";
+			std::cout << "4.) Odjavi se\n";
+
 			std::cout << "--> ";
 			std::cin >> option;
 			if (option == "1")
@@ -79,7 +81,13 @@ public:
 			{
 				buyTicket();
 			}
-		} while (option != "1" && option != "2" && option != "3");
+			else if (option == "4")
+			{
+				system("cls");
+				return 1;
+			}
+
+		} while (option != "1" && option != "2" && option != "3" && option != "4");
 
 	}
 
@@ -508,7 +516,7 @@ public:
 		std::ofstream ticketFile("Tickets.txt", std::ios::in | std::ios::app);
 		std::string ticket;
 		ticket = generate_random_string();
-		ticketFile << ticket << " " << driveID << std::endl;
+		ticketFile << ticket << " " << driveID << " " << username << std::endl;
 		std::cout << ticket << std::endl;
 		ticketFile.close();
 	}
