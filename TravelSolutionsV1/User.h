@@ -44,6 +44,7 @@ public:
 
 	void menu()
 	{
+		std::cout << "Vase stanje na racunu: " << this->balance << "KM" << std::endl << std::endl;
 		printDrives();
 		std::string option;
 		do
@@ -51,6 +52,7 @@ public:
 			std::cout << "\nIzaberite unosenjem broja zeljenu opciju:\n\n";
 			std::cout << "1.) Pretrazivanje voznji\n";
 			std::cout << "2.) Unos poklon bona\n";
+			std::cout << "3.) Kupi kartu\n";
 			std::cout << "--> ";
 			std::cin >> option;
 			if (option == "1")
@@ -73,7 +75,11 @@ public:
 			{
 				insertCoupon();
 			}
-		} while (option != "1" && option != "2");
+			else if (option == "3")
+			{
+				buyTicket();
+			}
+		} while (option != "1" && option != "2" && option != "3");
 
 	}
 
@@ -359,5 +365,165 @@ public:
 			}
 
 		}
+	}
+
+	void buyTicket()
+	{
+		bool existID = false;
+		std::string idDrive;
+		std::ifstream driveFile("Drive.txt");
+		int n = num_of_lines("Drive.txt");
+
+		std::cout << "Unesite ID voznje za koju zelite kupiti karte: " << std::endl;
+		std::cout << "--> ";
+		std::cin >> idDrive;
+
+		std::string out, out1;
+		int numOfFreeSeats;
+		double price = 0;
+
+		while (n)
+		{
+			driveFile >> out;
+			if (out == idDrive)
+			{
+				existID = true;
+				for (int i = 0; i < 8; i++) //citamo cijenu jedne karte
+					driveFile >> out;
+				price = stod(out);
+				driveFile >> out;
+				numOfFreeSeats = stoi(out);
+				break;
+			}
+			getline(driveFile, out1);
+			n--;
+		}
+		driveFile.close();
+
+		if (!existID)
+		{
+			system("cls");
+			std::cout << "Unijeli ste nepostojeci broj." << std::endl << std::endl;
+			menu();
+		}
+		std::string numOfTickets;
+		int numberOfTickets;
+		std::cout << "Unesite broj karti koje zelite kupiti: ";
+		std::cin >> numOfTickets;
+		numberOfTickets = stoi(numOfTickets);
+
+		if (numberOfTickets > numOfFreeSeats)
+		{
+			system("cls");
+			std::cout << "Oprostite, ali nema dovoljno mjesta." << std::endl << std::endl;
+			menu();
+		}
+		else if (numberOfTickets * price > this->balance)
+		{
+			system("cls");
+			std::cout << "Nemate dovoljan iznos na racunu." << std::endl << std::endl;
+			menu();
+		}
+		else
+		{
+			system("cls");
+			std::cout << "Transakcija je uspjesna. Kodove za karte sacuvajte:" << std::endl;
+			for (int i = 0; i < numberOfTickets; i++)
+			{
+				generateTicket(idDrive);
+			}
+			system("pause");
+			system("cls");
+			balance = balance - numberOfTickets * price;
+			//otvaranje fajla sa korisnicima kako bi se promijenio iznos na racunu
+			std::fstream oldFile("Users.txt", std::ios::in);
+			std::fstream newFile("TempName.txt", std::ios::out);
+			int num = num_of_lines("Users.txt");
+
+			//string pomocu kojeg citamo iz fajla
+			std::string out;
+			int line = manipulate_at(this->username);
+
+			//trazimo liniju gdje se nalazi korisnik i mjesto gdje je odredjeno za stanje na racunu azuriramo
+			for (int i = 0; i < num; i++)
+			{
+				for (int j = 0; j < 7; j++)
+				{
+					oldFile >> out;
+					if ((i == line) && (j == 6))
+					{
+						newFile << balance;
+					}
+					else
+						newFile << out;
+					if (j != 6)
+						newFile << " ";
+				}
+				newFile << std::endl;
+			}
+			oldFile.close();
+			newFile.close();
+
+			remove("Users.txt");
+			rename("TempName.txt", "Users.txt");
+			//otvaranje fajla sa voznjama kako bi se promijenio broj slobodnih mjesta
+			std::fstream oldFile2("Drive.txt", std::ios::in);
+			std::fstream newFile2("TempName.txt", std::ios::out);
+			int num2 = num_of_lines("Drive.txt");
+			//string pomocu kojeg citamo iz fajla
+			std::string out2;
+			std::string currID;
+
+			//trazimo liniju gdje se nalazi voznja i mjesto gdje je odredjeno za broj slobodnih mjesta azuriramo
+			for (int i = 0; i < num2; i++)
+			{
+				for (int j = 0; j < 11; j++)
+				{
+					oldFile2 >> out2;
+					if (j == 0)
+						currID = out2;
+					if ((currID == idDrive) && (j == 9))
+					{
+						newFile2 << numOfFreeSeats - numberOfTickets;
+					}
+					else
+						newFile2 << out2;
+					if (j != 10)
+						newFile2 << " ";
+				}
+				newFile2 << std::endl;
+			}
+			oldFile2.close();
+			newFile2.close();
+
+			remove("Drive.txt");
+			rename("TempName.txt", "Drive.txt");
+
+			menu();
+		}
+	}
+
+	void generateTicket(std::string driveID)
+	{
+		std::ofstream ticketFile("Tickets.txt", std::ios::in | std::ios::app);
+		std::string ticket;
+		ticket = generate_random_string();
+		ticketFile << ticket << " " << driveID << std::endl;
+		std::cout << ticket << std::endl;
+		ticketFile.close();
+	}
+
+	std::string generate_random_string()
+	{
+		std::string random_string;
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(0, 25);
+		for (int i = 0; i < 10; i++) 
+		{
+			char c = 'a' + dis(gen);
+			random_string += c;
+		}
+		return random_string;
 	}
 };
