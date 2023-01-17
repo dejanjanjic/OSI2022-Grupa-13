@@ -63,42 +63,6 @@ public:
 				printPastForDriver();
 				do
 				{
-					std::cout << "\n\nUnesite 1 za povratak nazad\n";
-					std::cout << "-->";
-					std::cin >> option1;
-					if (option == "1")
-					{
-						system("cls");
-						menu();
-					}
-				} while (option1 != "1");
-			}
-
-			else if (option == "2")
-			{
-				std::string option1;
-				 bool odvezeno=printPastForDriver();
-				prijaviIncident(odvezeno);
-				do
-				{
-					std::cout << "\n\nUnesite 1 za povratak nazad\n";
-					std::cout << "-->";
-					std::cin >> option1;
-					if (option == "1")
-					{
-						system("cls");
-						menu();
-					}
-				} while (option1 != "1");
-			}
-
-			else if (option == "3")
-			{
-				std::string option1;
-				bool odvezeno=printPastForDriver();
-				dodajIzvjestaj(odvezeno);
-				do
-				{
 					std::cout << "\nUnesite 1 za povratak nazad\n";
 					std::cout << "-->";
 					std::cin >> option1;
@@ -109,12 +73,133 @@ public:
 					}
 				} while (option1 != "1");
 			}
+			else if (option == "2")
+			{
+				system("cls");
+				std::string option3;
+				bool odvezeno = printPastForDriver();
+				prijaviIncident(odvezeno);
+				do
+				{
+					std::cout << "\nUnesite 1 za povratak nazad\n";
+					std::cout << "-->";
+					std::cin >> option3;
+					if (option3 == "1")
+					{
+						system("cls");
+						menu();
+					}
+				} while (option3 != "1");
+			}
+
+			else if (option == "3")
+			{
+				std::string option2;
+				system("cls");
+				bool odvezeno = printPastForDriver();
+				dodajIzvjestaj(odvezeno);
+				do
+				{
+					std::cout << "\nUnesite 1 za povratak nazad\n";
+					std::cout << "-->";
+					std::cin >> option2;
+					if (option2 == "1")
+					{
+						system("cls");
+						menu();
+					}
+				} while (option2 != "1");
+			}
+			else
+			{
+				std::cout << "Nepostojeca opcija. Pokusajte ponovo.\n";
+			}
 		} while (option != "1" && option != "2" && option != "3");
 	}
+
 	void dodajIzvjestaj(bool odvezeno)
 	{
-		std::cout << "OK";
+		if (odvezeno == false)
+		{
+			std::cout << "Nemoguce dodati izvjestaj.\n";
+		}
+		else
+		{
+			std::cout << "Unesite ID voznje za koju zelite da dodate izvjestaj.\n";
+			std::string ID, line, tekst;
+			std::cout << "-->";
+			std::cin >> ID;
+			std::fstream dfile("Drive.txt", std::ios::in | std::ios::out);
+			std::fstream ifile;
+			if (dfile.is_open())
+			{
+				long long pos = dfile.tellg();
+				while (getline(dfile, line))
+				{
+					if (line.find(ID) != std::string::npos)
+					{
+						std::string driveID, tourID, driver, busID, date1, time1, date2, time2, price, numSeats, izvjestaj;
+						std::stringstream ss(line);
+						ss >> driveID >> tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats >> izvjestaj;
+						if ((ID == driveID) && (izvjestaj == "0"))
+						{
+							ifile.open("Reports.txt", std::ios::app);
+							ifile << ID << " ";
+							std::cout << "Unesite izvjestaj:\n";
+							std::cin.ignore();
+							getline(std::cin, tekst);
+							ifile << tekst << std::endl;
+							ifile.close();
+
+							std::string format_datuma = "%d.%m.%Y.";
+							std::string format_vremena = "%H:%M";
+
+							std::tm datum2 = {};
+							std::istringstream ss_datum2(date2);
+							ss_datum2 >> std::get_time(&datum2, format_datuma.c_str());
+
+							std::tm vrijeme2 = {};
+							std::istringstream ss_vrijeme2(time2);
+							ss_vrijeme2 >> std::get_time(&vrijeme2, format_vremena.c_str());
+
+							datum2.tm_hour = vrijeme2.tm_hour;
+							datum2.tm_min = vrijeme2.tm_min;
+
+							std::time_t unix_time2 = std::mktime(&datum2);
+							std::chrono::system_clock::time_point time_point2 = std::chrono::system_clock::from_time_t(unix_time2);
+
+							auto current_time = std::chrono::system_clock::now();
+							auto time_diff = std::chrono::duration_cast<std::chrono::hours>(current_time - time_point2);
+
+							if (time_diff.count() > 24)
+							{
+								std::cout << "Izvjestaj nije dodan u naredna 24h od datuma i vremena voznje.\n";
+							}
+							else
+							{
+								// promjena zadnjeg stringa u liniji
+								std::string lastString;
+								std::stringstream ss(line);
+								while (ss >> lastString);
+								pos += line.rfind(lastString);
+								dfile.seekp(pos);
+								dfile << "1";
+								break;
+								std::cout << "Izvjestaj je uspjesno dodan.\n";
+							}
+						}
+						else if (izvjestaj == "1")
+						{
+							std::cout << "Nemoguce je ponovo dodati izvjestaj.\n";
+						}
+					}
+					pos = dfile.tellg();
+				}
+			}
+			dfile.close();
+		}
 	}
+
 
 	void prijaviIncident(bool odvozeno)
 	{
@@ -128,48 +213,55 @@ public:
 			std::string ID, line, tekst;
 			std::cout << "-->";
 			std::cin >> ID;
-			std::fstream dfile("Drive.txt");
-			std::fstream ifile;
-			if (dfile.is_open())
+			bool check = check_idDrive_exist(ID);
+			if (check == false)
 			{
-				while (getline(dfile, line))
+				std::fstream dfile("Drive.txt");
+				std::fstream ifile;
+				if (dfile.is_open())
 				{
-					if (line.find(ID) != std::string::npos)
+					while (getline(dfile, line))
 					{
-						std::string driveID;
-						std::stringstream ss(line);
-						ss >> driveID;
-						if (ID == driveID)
+						if (line.find(ID) != std::string::npos)
 						{
-							ifile.open("Incidentes.txt", std::ios::app);
-							ifile << ID << " ";
-							std::cout << "Unesite podatke o incidentu:\n";
-							std::cin.ignore();
-							getline(std::cin, tekst);
-							ifile << tekst << std::endl;
-							ifile.close();
+							std::string driveID;
+							std::stringstream ss(line);
+							ss >> driveID;
+							if (ID == driveID)
+							{
+								ifile.open("Incidentes.txt", std::ios::app);
+								ifile << ID << " ";
+								std::cout << "Unesite podatke o incidentu:\n";
+								std::cin.ignore();
+								getline(std::cin, tekst);
+								ifile << tekst << std::endl;
+								ifile.close();
+							}
+							std::cout << "Uspjesno ste dodali incident.\n";
 						}
-						std::cout << "Uspjesno ste dodali incident.\n";
 					}
-				}
-			}dfile.close();
+				}dfile.close();
+			}
+			else
+				std::cout << "Pogresan ID. Pokusajte ponovo.\n";
 		}
 	}
 
 	bool printPastForDriver()
 	{
-		bool odvozeno = true;
+		bool odvozeno;
 		std::string line1, locations, inside_string;
 		std::fstream dfile("Drive.txt", std::ios::in);
 		if (dfile.is_open())
 		{
 			while (getline(dfile, line1))
 			{
+				odvozeno = true;
 				if (line1.find(this->username) != std::string::npos)
 				{
 					std::string driveID, tourID, busID, date1, date2, time1, time2, driver, price, numSeats, izvjestaj;
 					std::stringstream ss(line1);
-					ss >> line1 >> tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats >> izvjestaj;
+					ss >> driveID >> tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats >> izvjestaj;
 					std::fstream uFile("Tours.txt", std::ios::in);
 					if (uFile.is_open())
 					{
@@ -191,7 +283,7 @@ public:
 							if (tourID == id2)
 							{
 								std::stringstream ss(line1);
-								ss >> line1 >> tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats >> izvjestaj;
+								ss >> driveID >> tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats >> izvjestaj;
 								std::string format_datuma = "%d.%m.%Y.";
 								std::string format_vremena = "%H:%M";
 
@@ -225,14 +317,16 @@ public:
 										std::cout << "Niste dodali izvjestaj za ovu voznju.\n\n";
 									}
 									else std::cout << "Izvjestaj za ovu voznju je dodat.\n";
-									std::cout << std::endl;
 								}
 							}
 						}
 					}uFile.close();
 				}
 				else
+				{
 					odvozeno = false;
+				}
+
 			}
 		}dfile.close();
 		if (odvozeno == false)
@@ -245,7 +339,6 @@ public:
 
 	void printNextForDriver()
 	{
-		bool next;
 		std::string driveID, line1, locations, inside_string;
 		std::fstream dfile("Drive.txt", std::ios::in);
 		if (dfile.is_open())
@@ -254,10 +347,9 @@ public:
 			{
 				if (line1.find(this->username) != std::string::npos)
 				{
-					next = true;
-					std::string tourID, date1, date2, time1, time2, driver, busID, price, izvjestaj, numSeats;
+					std::string driveID, tourID, date1, date2, time1, time2, driver, busID, price, izvjestaj, numSeats;
 					std::stringstream ss(line1);
-					ss >> line1 >> tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats >> izvjestaj;
+					ss >> driveID >> tourID >> driver >> busID >> date1 >> time1 >> date2 >> time2 >> price >> numSeats >> izvjestaj;
 					std::fstream uFile("Tours.txt", std::ios::in);
 					if (uFile.is_open())
 					{
@@ -300,12 +392,11 @@ public:
 								auto current_time = std::chrono::system_clock::now();
 								if (time_point > current_time)
 								{
-									std::cout << "\nPostoje sljedece voznje, stanice su u:\n";
+									std::cout << "\nPostoji sljedeca voznja: " << driveID << "\n";
 									std::cout << inside_string;
 									std::cout << std::endl;
 									std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
 									std::cout << "Datum i vrijeme dolaska: " << date2 << " " << time2 << std::endl;
-									std::cout << "ID voznje: " << driveID << std::endl;
 									std::cout << "Putovanje je ";
 									if (last_number == 1) std::cout << "unutar granica drzave. Pasos nije neophodan.\n\n";
 									else if (last_number == 0) std::cout << "izvan granica drzave. Pasos je neophodan.\n\n";
@@ -317,6 +408,7 @@ public:
 			}
 		}dfile.close();
 	}
+
 	/*void set_user_type() override
 	{
 		this->user_type = "3";
