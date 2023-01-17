@@ -223,7 +223,7 @@ public:
 									if (time_point > current_time)
 									{
 
-										std::cout << "\nID voznje:" << driveID << ":\n";
+										std::cout << "\nID voznje:" << driveID << "\n";
 										std::cout << inside_string;
 										std::cout << std::endl;
 										std::cout << "Datum i vrijeme polaska: " << date1 << " " << time1 << std::endl;
